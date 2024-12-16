@@ -1,0 +1,137 @@
+## Copyright © 2024, Oracle and/or its affiliates. 
+## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
+
+title: "Deploy AIStore into OCI Compute Instance"
+stackDescription: "Deploy AIStore into OCI Compute Instance"
+schemaVersion: 1.1.0
+version: "20190404"
+locale: "en"
+
+variableGroups:
+- title: General Configuration
+  visible: false
+  variables:
+  - tenancy_ocid
+  - region
+  
+  
+- title: Required Configuration
+  visible: true  
+  variables:
+  - compartment_ocid
+  - create_vcn
+  - vcn_id
+  - subnet_id
+  - vcn_name
+  - cidr_vcn
+  - cidr_pub_subnet
+  - vm_display_name
+  - ssh_public_key
+  - ad
+  - bucket_namespace
+  - aws_access_key_id
+  - aws_secret_access_key
+variables:
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    required: true
+    visibile: true
+    title: "Compartment"
+    description: "Choose compartment where you want to deploy the GPU VM"
+
+  create_vcn:
+    title: Create new VCN
+    description: Create new VCN for the OKE cluster.
+    type: boolean
+    default: true
+
+
+  vcn_id:
+    type: oci:core:vcn:id
+    title: "VCN"
+    description: "The VCN where will deploy the resources"
+    dependsOn:
+      compartmentId: ${compartment_ocid}
+    visible:
+      not:
+        - ${create_vcn}
+
+  subnet_id:
+    type: oci:core:subnet:id
+    title: "Subnet"
+    description: "The Subnet where will deploy the resource"
+    dependsOn:
+      compartmentId: ${compartment_ocid}
+      vcnId: ${vcn_id}
+    visible:
+      not:
+        - ${create_vcn}
+
+  
+  vcn_name:
+    type: string
+    minLength: 3
+    maxLength: 40
+    pattern: "^[a-zA-Z0-9][a-zA-Z0-9-]*?[a-zA-Z0-9]$"
+    title: VCN Name
+    description: The name of VCN where will deploy the resources
+    default: vcn
+    required: true
+    visible: ${create_vcn}
+
+  cidr_vcn:
+    type: string
+    pattern: "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\/(?:[1][6-9])|(?:2[0-8])$"
+    title: VCN CIDR Block
+    description: The CIDR block to use with the new VCN.
+    default: 10.0.0.0/16
+    required: true
+    visible: ${create_vcn}
+
+  cidr_pub_subnet:
+    type: string
+    pattern: "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\/(?:[1][6-9])|(?:2[0-8])$"
+    title: Public subnet CIDR
+    description: The CIDR block used for the Public subnet.
+    default: 10.0.0.0/24
+    required: true
+
+
+  vm_display_name:
+    type: string
+    required: true
+    visibile: true
+    title: "vm display name"
+    description: "VM display name"
+
+  ssh_public_key:
+    type: string
+    title: "Public SSH Key"
+    description: "Choose public SSH Key to be uploaded into compute instances."
+    required: true
+
+  ad:
+    type: oci:identity:availabilitydomain:name
+    title: "availability domain"
+    description: "Choose availability domain"
+    dependsOn:
+      compartmentId: ${compartment_ocid}
+    required: true
+
+  bucket_namespace:
+    type: string
+    title: "Bucket namespace"
+    description: "Choose namespace for object storage bucket"
+    required: true
+
+  aws_access_key_id:
+    type: string
+    title: "aws_access_key_id"
+    description: "Choose aws_access_key_id for S3 compatible Object Storage API"
+    required: true
+
+  aws_secret_access_key:
+    type: string
+    title: "aws_secret_access_key"
+    description: "Choose aws_secret_access_key for S3 compatible Object Storage API"
+    required: true
