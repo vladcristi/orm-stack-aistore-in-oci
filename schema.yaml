@@ -15,19 +15,29 @@ variableGroups:
   - region
   
   
-- title: Required Configuration
+- title: IAM Configuration
   visible: true  
   variables:
   - compartment_ocid
+
+- title: Network Configuration
+  visible: true  
+  variables:
   - create_vcn
   - vcn_id
   - subnet_id
   - vcn_name
   - cidr_vcn
   - cidr_pub_subnet
+- title: Instance Configuration
+  visible: true  
+  variables:
   - vm_display_name
   - ssh_public_key
   - ad
+- title: Bucket Configuration
+  visible: true  
+  variables:
   - bucket_namespace
   - aws_access_key_id
   - aws_secret_access_key
@@ -37,11 +47,11 @@ variables:
     required: true
     visibile: true
     title: "Compartment"
-    description: "Choose compartment where you want to deploy the GPU VM"
+    description: "Choose compartment where you want to deploy VM and OCI Object Storage"
 
   create_vcn:
     title: Create new VCN
-    description: Create new VCN for the OKE cluster.
+    description: Create new VCN for deployment.
     type: boolean
     default: true
 
@@ -113,7 +123,7 @@ variables:
   ad:
     type: oci:identity:availabilitydomain:name
     title: "availability domain"
-    description: "Choose availability domain"
+    description: "Choose availability domain for VM instance"
     dependsOn:
       compartmentId: ${compartment_ocid}
     required: true
